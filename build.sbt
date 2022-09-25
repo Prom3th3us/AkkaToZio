@@ -17,6 +17,12 @@ lazy val commonSettings = Seq(
   ).flatten
 )
 
+lazy val scalafixSettings: Seq[Setting[_]] = Seq(
+  addCompilerPlugin(scalafixSemanticdb),
+  semanticdbEnabled := true,
+  scalafixOnCompile := true
+)
+
 lazy val dockerSettings = Seq(
   dockerUsername              := sys.props.get("docker.username"),
   dockerRepository            := sys.props.get("docker.registry"),
@@ -31,14 +37,14 @@ lazy val e2e = project
   .settings(
     name := "e2e"
   )
-  .settings(commonSettings)
+  .settings(commonSettings, scalafixSettings)
   .dependsOn(akka)
 
 lazy val akka = project
   .settings(
     name := "akka"
   )
-  .settings(commonSettings)
+  .settings(commonSettings, scalafixSettings)
   .settings(
     libraryDependencies ++= Seq(
       Dependencies.Akka.all,

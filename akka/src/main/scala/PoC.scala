@@ -118,14 +118,14 @@ object PoC extends App {
       Producer.plainSink(producerSettings) // TODO
 
     val consumer: Source[ConsumerRecord[RequestId, RESPONSE], Consumer.Control] =
-      Consumer.plainSource(null) // TODO
+      Consumer.plainSource(???) // TODO
 
     val serverFlow = Flow.fromSinkAndSource(sink, source)
 
     serverFlow
 
     Tcp(system).bind("127.0.0.1", 9999).runForeach { incomingConnection =>
-      incomingConnection.handleWith(null) // TODO
+      incomingConnection.handleWith(???) // TODO
     }
 
   }
