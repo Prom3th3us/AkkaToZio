@@ -24,7 +24,7 @@ class PersistentActorSpec extends ActorTestSuite with BeforeAndAfterAll {
   "Persistent actors should be recover state after complete system shutdown" in {
 
     {
-      implicit val system        = ActorSystem.start
+      implicit val system        = ActorSystem.start(2552)
       implicit lazy val sharding = ClusterSharding.apply(system)
       val sharded = ShardedActor[Increment](
         uniqueName = "PersistentCounterActor",
@@ -42,7 +42,7 @@ class PersistentActorSpec extends ActorTestSuite with BeforeAndAfterAll {
     Thread.sleep(5000)
 
     {
-      implicit val system        = ActorSystem.start
+      implicit val system        = ActorSystem.start(2553)
       implicit lazy val sharding = ClusterSharding.apply(system)
       val sharded = ShardedActor[Increment](
         uniqueName = "PersistentCounterActor",

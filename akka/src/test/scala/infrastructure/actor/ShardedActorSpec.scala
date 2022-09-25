@@ -4,7 +4,7 @@ import akka.cluster.sharding.typed.scaladsl.ClusterSharding
 import infrastructure.actor.ExampleActor._
 
 class ShardedActorSpec extends ActorTestSuite {
-  implicit val system        = ActorSystem.start
+  implicit val system        = ActorSystem.start(2551)
   implicit lazy val sharding = ClusterSharding.apply(system)
 
   "Sharded actors should be segregated by id" in {

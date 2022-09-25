@@ -1,1 +1,1 @@
-docker exec -i cassandra bash -c 'cqlsh' < src/main/resources/cassandra.cleanup.cql
+docker exec -i cassandra bash -c 'cqlsh' < scripts/cassandra.cleanup.cql
