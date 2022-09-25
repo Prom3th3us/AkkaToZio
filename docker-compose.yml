@@ -1,0 +1,20 @@
+version: '3'
+services:
+  cassandra:
+    container_name: cassandra
+    image: cassandra
+    ports:
+      - 9042:9042
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.1.0
+    container_name: zookeeper
+    restart: always
+    hostname: zookeeper
+    ports:
+      - "2181:2181"
+    volumes:
+      - ./data/zookeeper:/var/lib/zookeeper/data
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+      ZOO_MY_ID: 2
