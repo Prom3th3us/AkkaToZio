@@ -1,14 +1,14 @@
 package infrastructure.actor
 
 import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.{ActorRef, Behavior}
+import akka.actor.typed.{ ActorRef, Behavior }
 import akka.persistence.typed.PersistenceId
 //import akka.persistence.typed.state.scaladsl.{DurableStateBehavior, Effect}
-import akka.persistence.typed.scaladsl.{Effect, EventSourcedBehavior}
+import akka.persistence.typed.scaladsl.{ Effect, EventSourcedBehavior }
 
 object ExampleActor {
   case class Increment(replyTo: ActorRef[Int]) extends JsonSerializable
-  case class Incremented(amount: Int) extends JsonSerializable
+  case class Incremented(amount: Int)          extends JsonSerializable
 
   object CounterActor {
     def empty = CounterActor(0)
@@ -22,12 +22,11 @@ object ExampleActor {
 
   object PersistentCounterActor {
     def apply(id: String): Behavior[Increment] = {
-      Behaviors.setup { context =>
+      Behaviors.setup { _ =>
         EventSourcedBehavior[Increment, Incremented, Int](
-          persistenceId =
-            PersistenceId.ofUniqueId(s"PersistentCounterActor-${id}"),
+          persistenceId = PersistenceId.ofUniqueId(s"PersistentCounterActor-${id}"),
           emptyState = 0,
-          commandHandler = { (state: Int, command: Increment) =>
+          commandHandler = { (_, command: Increment) =>
             Effect.persist(Incremented(1)).thenRun { state =>
               command.replyTo ! state
             }

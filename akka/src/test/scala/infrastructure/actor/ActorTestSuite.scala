@@ -1,7 +1,7 @@
 package infrastructure.actor
 
 import akka.actor.typed.ActorSystem
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.{ Config, ConfigFactory }
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 
@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 trait ActorTestSuite extends AsyncWordSpec with Matchers {
 
-  val config: Config = ConfigFactory.load
+  val config: Config  = ConfigFactory.load
   val actorSystemName = this.getClass.getSimpleName
 
   object ActorSystem {
@@ -22,7 +22,7 @@ trait ActorTestSuite extends AsyncWordSpec with Matchers {
       system.whenTerminated
     }
     def restart(system: ActorSystem[Nothing]) =
-      stop(system) map { done =>
+      stop(system) map { _ =>
         start
       }
   }

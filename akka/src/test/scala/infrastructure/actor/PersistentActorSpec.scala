@@ -5,7 +5,6 @@ import infrastructure.actor.ExampleActor._
 import org.scalatest.BeforeAndAfterAll
 
 import scala.sys.process._
-import scala.util.{ Failure, Success, Try }
 
 class PersistentActorSpec extends ActorTestSuite with BeforeAndAfterAll {
 
@@ -19,6 +18,7 @@ class PersistentActorSpec extends ActorTestSuite with BeforeAndAfterAll {
     super.afterAll()
     val script = "cassandra.cleanup.sh"
     s"""bash scripts/$script""".!!
+    ()
   }
 
   "Persistent actors should be recover state after complete system shutdown" in {
@@ -31,9 +31,9 @@ class PersistentActorSpec extends ActorTestSuite with BeforeAndAfterAll {
         behavior = PersistentCounterActor.apply
       )
       for {
-        a    <- sharded.ask("A")(Increment)
-        b    <- sharded.ask("B")(Increment)
-        done <- ActorSystem.stop(system)
+        a <- sharded.ask("A")(Increment)
+        b <- sharded.ask("B")(Increment)
+        _ <- ActorSystem.stop(system)
       } yield {
         Seq(a, b) should be(Seq(1, 1))
       }
@@ -49,9 +49,9 @@ class PersistentActorSpec extends ActorTestSuite with BeforeAndAfterAll {
         behavior = PersistentCounterActor.apply
       )
       for {
-        a    <- sharded.ask("A")(Increment)
-        b    <- sharded.ask("B")(Increment)
-        done <- ActorSystem.stop(system)
+        a <- sharded.ask("A")(Increment)
+        b <- sharded.ask("B")(Increment)
+        _ <- ActorSystem.stop(system)
       } yield Seq(a, b) should be(Seq(2, 2))
     }
 

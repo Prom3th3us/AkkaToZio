@@ -6,7 +6,6 @@ import akka.cluster.sharding.typed.scaladsl.{ ClusterSharding, Entity, EntityTyp
 import akka.util.Timeout
 
 import scala.concurrent.duration.DurationInt
-import scala.language.postfixOps
 
 case class ShardedActor[Command](
     uniqueName: String,
