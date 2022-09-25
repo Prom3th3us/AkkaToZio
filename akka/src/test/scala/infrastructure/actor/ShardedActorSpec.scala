@@ -2,8 +2,9 @@ package infrastructure.actor
 
 import akka.cluster.sharding.typed.scaladsl.ClusterSharding
 import infrastructure.actor.ExampleActor._
+import org.scalatest.BeforeAndAfterAll
 
-class ShardedActorSpec extends ActorTestSuite {
+class ShardedActorSpec extends ActorTestSuite with BeforeAndAfterAll {
   implicit val system        = ActorSystem.start(2551)
   implicit lazy val sharding = ClusterSharding.apply(system)
 
@@ -22,5 +23,11 @@ class ShardedActorSpec extends ActorTestSuite {
       e <- sharded.ask("C")(Increment)
     } yield Seq(a, b, c, d, e) should be(Seq(0, 0, 0, 1, 2))
 
+  }
+
+  override def afterAll() = {
+    super.afterAll()
+    ActorSystem.stop(system)
+    ()
   }
 }
