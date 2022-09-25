@@ -27,4 +27,6 @@ project/project/
 .history
 .cache
 .lib/
+project/project/.bloop/**
+project/.bloop/
 .bloop/
