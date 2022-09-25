@@ -1,8 +1,8 @@
 package infrastructure.actor
 
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior}
+import akka.actor.typed.{ ActorRef, ActorSystem, Behavior }
 import akka.cluster.sharding.typed.ShardingEnvelope
-import akka.cluster.sharding.typed.scaladsl.{ClusterSharding, Entity, EntityTypeKey}
+import akka.cluster.sharding.typed.scaladsl.{ ClusterSharding, Entity, EntityTypeKey }
 import akka.util.Timeout
 
 import scala.concurrent.duration.DurationInt

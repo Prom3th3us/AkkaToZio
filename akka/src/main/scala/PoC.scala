@@ -1,12 +1,12 @@
 import Main.producerSettings
-import akka.{Done, NotUsed}
-import akka.actor.{Actor, ActorRef, Props}
+import akka.{ Done, NotUsed }
+import akka.actor.{ Actor, ActorRef, Props }
 import akka.cluster.sharding._
-import akka.kafka.scaladsl.{Consumer, Producer}
-import akka.pattern.{ask, pipe}
-import akka.stream.{OverflowStrategy, QueueOfferResult}
+import akka.kafka.scaladsl.{ Consumer, Producer }
+import akka.pattern.{ ask, pipe }
+import akka.stream.{ OverflowStrategy, QueueOfferResult }
 import akka.stream.scaladsl._
-import akka.util.{ByteString, Timeout}
+import akka.util.{ ByteString, Timeout }
 import com.typesafe.config.ConfigFactory
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -32,9 +32,8 @@ object PoC extends App {
 
   trait HasRequestId { val requestId: RequestId }
   case class RequestId(id: String)
-  case class POST(requestId: RequestId, payload: String) extends HasRequestId
-  case class RESPONSE(requestId: RequestId, payload: String)
-      extends HasRequestId
+  case class POST(requestId: RequestId, payload: String)     extends HasRequestId
+  case class RESPONSE(requestId: RequestId, payload: String) extends HasRequestId
   trait Kafka {
     def sendMessage(post: POST): Future[QueueOfferResult]
   }
@@ -43,7 +42,7 @@ object PoC extends App {
     override def receive: Receive = {
       case post: POST =>
         inflight.addOne(post.requestId -> sender())
-        //kafka.sendMessage(post) ma
+        kafka.sendMessage(post)
       case response: RESPONSE =>
         inflight.remove(response.requestId).map { ref =>
           ref ! response.payload
@@ -116,22 +115,22 @@ object PoC extends App {
     val sourceWithFraming = source.map(text => text + " -- ") */
 
     val producer: Sink[ProducerRecord[RequestId, POST], Future[Done]] =
-      ??? // Producer.plainSink(producerSettings)
-    val consumer
-        : Source[ConsumerRecord[RequestId, RESPONSE], Consumer.Control] =
-      ??? //Consumer.plainSource(???)
+      Producer.plainSink(producerSettings) // TODO
+
+    val consumer: Source[ConsumerRecord[RequestId, RESPONSE], Consumer.Control] =
+      Consumer.plainSource(null) // TODO
 
     val serverFlow = Flow.fromSinkAndSource(sink, source)
 
     serverFlow
 
     Tcp(system).bind("127.0.0.1", 9999).runForeach { incomingConnection =>
-      incomingConnection.handleWith(???)
+      incomingConnection.handleWith(null) // TODO
     }
 
   }
 
-  val actor = system.actorOf(Props(new RequestActor(KafkaMock)))
+  val actor            = system.actorOf(Props(new RequestActor(KafkaMock)))
   implicit val timeout = Timeout(1 second)
   for {
     response <- actor.ask(POST(RequestId("1"), "hello")).mapTo[String]

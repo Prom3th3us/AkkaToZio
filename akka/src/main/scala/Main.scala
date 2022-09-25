@@ -1,15 +1,14 @@
-import akka.kafka.{ProducerMessage, ProducerSettings}
-import akka.kafka.ProducerMessage.MultiResultPart
+import com.typesafe.config.ConfigFactory
+import akka.kafka.{ ProducerMessage, ProducerSettings }
 import akka.kafka.scaladsl.Producer
 import akka.stream.scaladsl._
-import com.typesafe.config.ConfigFactory
 import io.prometheus.client.exporter.HTTPServer
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.StringSerializer
 
-import scala.util.Random
-
 object Main extends App {
+
+  kamon.Kamon.init()
 
   import io.prometheus.client.Counter
   val messagesPublished: Counter =
@@ -43,8 +42,8 @@ object Main extends App {
 
   object amount {
     val messages = config.getInt("messagesAmount")
-    val users = messages / 10
-    val chats = messages / 1000
+    val users    = messages / 10
+    val chats    = messages / 1000
   }
 
   println(s"""

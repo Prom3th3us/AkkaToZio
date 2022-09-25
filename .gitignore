@@ -1,4 +1,7 @@
 **/target
-.bsp
-.idea
+.bsp/
+.idea/
+.vscode/
+.metals/
+project/metals.sbt
 data
