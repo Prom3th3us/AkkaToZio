@@ -26,9 +26,7 @@ object GuildApp extends ZIOAppDefault {
       _     <- guild.send("guild1")(Join(user1, _)).debug
       _     <- guild.send("guild1")(Join(user2, _)).debug
       _     <- guild.send("guild1")(Join(user3, _)).debug
-      // TODO WHY THIS CODE CANNOT BE WRITTEN? Error: dead code following this construct
-      // REFERENCE https://github.com/devsisters/shardcake/blob/c11df6ec95374a168c8e44e94ee21de4220849ec/examples/src/main/scala/example/complex/GuildApp.scala#L29
-      //  _     <- ZIO.never
+      _     <- ZIO.never
     } yield ()
 
   def run: Task[Unit] =
