@@ -43,7 +43,7 @@ object ActorTestSuite {
                    |      canonical.port = ${port}
                    |    }
                    |    cluster.seed-nodes = ["akka://${name}@0.0.0.0:${port}"]
-                   |    
+                   |
                    |  }
                    |""".stripMargin
             ),

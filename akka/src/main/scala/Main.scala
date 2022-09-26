@@ -49,11 +49,11 @@ object Main extends App {
   println(s"""
       |
       |  BENCHMARK
-      |  
+      |
       |  - messages: ${amount.messages}
       |  - topic: ${topic}
-      |  
-      |  
+      |
+      |
       |""".stripMargin)
   object dataset {
     val messages = Seq(
