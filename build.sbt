@@ -1,5 +1,5 @@
 // Global Settings
-ThisBuild / scalaVersion    := "2.13.9"
+ThisBuild / scalaVersion    := "2.13.8"
 ThisBuild / organization    := "Prom3theus"
 ThisBuild / versionScheme   := Some("early-semver")
 ThisBuild / dynverSeparator := "-"
