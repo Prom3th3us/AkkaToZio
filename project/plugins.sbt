@@ -2,9 +2,8 @@
 addSbtPlugin("com.eed3si9n" % "sbt-buildinfo" % "0.11.0")
 addSbtPlugin("com.dwijnand" % "sbt-dynver"    % "4.1.1")
 
-// Packing and Publishing
+// Packing
 addSbtPlugin("com.github.sbt" % "sbt-native-packager" % "1.9.0")
-addSbtPlugin("com.mintbeans"  % "sbt-ecr"             % "0.16.0")
 
 // Linting & Styling
 addSbtPlugin("io.github.davidgregory084" % "sbt-tpolecat" % "0.1.22")
