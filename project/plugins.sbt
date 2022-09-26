@@ -16,6 +16,3 @@ addDependencyTreePlugin
 // Kamon
 addSbtPlugin("com.lightbend.sbt" % "sbt-javaagent"     % "0.1.6")
 addSbtPlugin("io.kamon"          % "sbt-kanela-runner" % "2.0.14")
-
-// Github Actions: https://github.com/djspiewak/sbt-github-actions
-addSbtPlugin("com.codecommit" % "sbt-github-actions" % "0.14.2")
