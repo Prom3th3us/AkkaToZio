@@ -6,6 +6,7 @@ ThisBuild / dynverSeparator := "-"
 ThisBuild / conflictManager := ConflictManager.latestRevision
 ThisBuild / javacOptions ++= Seq("-source", "17", "-target", "17")
 ThisBuild / scalacOptions ++= Seq("-Ymacro-annotations", "-target:jvm-17")
+ThisBuild / publish / skip := true // TODO
 
 lazy val commonSettings = Seq(
   run / fork                := true,
