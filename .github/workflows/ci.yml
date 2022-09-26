@@ -20,12 +20,10 @@ jobs:
         java: [zulu@17]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout current branch (not full)
-        uses: actions/checkout@v2
+      - name: Checkout current branch (full)
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 100
-      - name: Fetch tags
-        run: git fetch --depth=100 origin +refs/tags/*:refs/tags/*
+          fetch-depth: 0
         
       - name: Setup Java (zulu@17)
         if: matrix.java == 'zulu@17'
@@ -35,7 +33,7 @@ jobs:
           java-version: 17
 
       - name: Cache sbt
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             ~/.sbt
@@ -73,13 +71,11 @@ jobs:
         java: [zulu@17]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout current branch (not full)
+      - name: Checkout current branch (full)
         uses: actions/checkout@v2
         with:
-          fetch-depth: 100
-      - name: Fetch tags
-        run: git fetch --depth=100 origin +refs/tags/*:refs/tags/*
-
+          fetch-depth: 0
+      
       - name: Setup Java (zulu@17)
         if: matrix.java == 'zulu@17'
         uses: actions/setup-java@v3
