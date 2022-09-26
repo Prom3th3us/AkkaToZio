@@ -53,8 +53,10 @@ lazy val akka = project
   )
   .settings(dockerSettings)
   .settings(
-    libraryDependencies ++= Dependencies.Prometheus.all,
-    libraryDependencies ++= Dependencies.Kamon.all,
+    libraryDependencies ++= Seq(
+      Dependencies.Prometheus.all,
+      Dependencies.Kamon.all
+    ).flatten,
     javaAgents += Dependencies.Kamon.agent
   )
   .enablePlugins(DockerPlugin, AshScriptPlugin, JavaAgent)
@@ -65,15 +67,12 @@ lazy val zio = project
   )
   .settings(commonSettings, scalafixSettings)
   .settings(
-    // https://mvnrepository.com/artifact/dev.zio/zio-actors
-    // https://mvnrepository.com/artifact/dev.zio/zio-actors-persistence
-    libraryDependencies += "dev.zio"               %% "zio"                    % "2.0.2",
-    libraryDependencies += "dev.zio"               %% "zio-test"               % "2.0.0",
-    libraryDependencies += "dev.zio"               %% "zio-actors-persistence" % "0.0.9",
-    libraryDependencies += "dev.zio"               %% "zio-actors"             % "0.0.9",
-    libraryDependencies += "io.getquill"           %% "quill-cassandra"        % "4.4.1",
-    libraryDependencies += "com.datastax.cassandra" % "cassandra-driver-core"  % "3.11.3",
-    libraryDependencies += "io.circe"              %% "circe-core"             % "0.15.0-M1",
-    libraryDependencies += "io.circe"              %% "circe-parser"           % "0.15.0-M1",
-    libraryDependencies += "io.circe"              %% "circe-generic"          % "0.15.0-M1"
+    libraryDependencies ++= Seq(
+      Dependencies.Zio.all,
+      Dependencies.Circee.all,
+      Dependencies.Quill.all,
+      Dependencies.Cassandra.all
+    ).flatten
   )
+  .settings(dockerSettings)
+  .enablePlugins(DockerPlugin, AshScriptPlugin)
