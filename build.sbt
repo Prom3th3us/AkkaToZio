@@ -73,7 +73,8 @@ lazy val zio = project
   )
   .settings(commonSettings, scalafixSettings)
   .settings(
-    libraryDependencies ++= Seq(
+    <<<<<<< HEAD
+      libraryDependencies ++= Seq(
       Dependencies.Zio.all,
       Dependencies.Circee.all,
       Dependencies.Quill.all,
