@@ -27,18 +27,23 @@ lazy val dockerSettings = Seq(
   dockerUsername              := sys.props.get("docker.username"),
   dockerRepository            := sys.props.get("docker.registry"),
   Docker / version            := "latest",
-  Docker / organization       := "miguelemos",
+  Docker / organization       := "prom3theus",
   Docker / dockerBaseImage    := "openjdk",
-  Docker / packageName        := "miguelemos/akka-to-zio",
-  Docker / dockerExposedPorts := Seq(9095)
+  Docker / packageName        := "prom3theus/akka-to-zio",
+  Docker / dockerExposedPorts := Seq(9042)
 )
+
+lazy val root = (project in file("."))
+  .settings(
+    name := "akka-to-zio"
+  )
+  .aggregate(akka, zio, e2e)
 
 lazy val e2e = project
   .settings(
     name := "e2e"
   )
   .settings(commonSettings, scalafixSettings)
-  .dependsOn(akka)
 
 lazy val akka = project
   .settings(
