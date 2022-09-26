@@ -44,8 +44,15 @@ jobs:
             ~/Library/Caches/Coursier/v1
           key: ${{ runner.os }}-sbt-cache-v2-${{ hashFiles('**/*.sbt') }}-${{ hashFiles('project/build.properties') }}
 
+      - name: Start containers
+        run: docker-compose -f "docker/docker-compose.yml" up -d --build
+
       - name: Build project
         run: sbt ++${{ matrix.scala }} test
+
+      - name: Stop containers
+        if: always()
+        run: docker-compose -f "docker/docker-compose.yml" down  -v
 
       - name: Compress target directories
         run: tar cf targets.tar target e2e/target akka/target zio/target project/target
