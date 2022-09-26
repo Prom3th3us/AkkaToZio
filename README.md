@@ -17,3 +17,9 @@ $ pre-commit install
 |Scala        | 2.13 |
 |SBT          | 1.7.1 |
 |JAVA         | 17 |
+
+
+### To run the shard-cake example:
+- ```bash cd docker; docker-compose up redis```
+- ```bash sbt "zio/runMain example.complex.ShardManagerApp"```
+- ```bash sbt "zio/runMain example.complex.GuildApp"```
