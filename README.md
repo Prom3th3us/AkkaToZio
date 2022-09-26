@@ -20,6 +20,7 @@ $ pre-commit install
 
 
 ### To run the shard-cake example:
-- ```bash cd docker; docker-compose up redis```
-- ```bash sbt "zio/runMain example.complex.ShardManagerApp"```
-- ```bash sbt "zio/runMain example.complex.GuildApp"```
+To run the shard-cake example:
+- ```cd docker; docker-compose up redis```
+- ```sbt "zio/runMain example.complex.ShardManagerApp"```
+- ```sbt "zio/runMain example.complex.GuildApp"```
