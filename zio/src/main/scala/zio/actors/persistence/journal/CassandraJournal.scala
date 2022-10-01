@@ -13,11 +13,12 @@ import zio.{ Promise, Runtime, Task, Unsafe, ZIO }
 import scala.concurrent.ExecutionContext
 
 final class CassandraJournal[Ev](
-    db: CassandraClient
+    db: CassandraClient,
+    numberOfShards: Int
 ) extends Journal[Ev] {
 
   object Sharding {
-    def shardId: String => Long = _.hashCode % 3 // @TODO
+    def shardId: String => Long = entityId => math.abs(entityId.hashCode % numberOfShards) + 1
   }
 
   object EventSourcing {
@@ -81,7 +82,7 @@ object CassandraJournal extends JournalFactory {
     for {
       tnx <- getTransactor
       db = CassandraClient()(tnx)
-    } yield new CassandraJournal(db)
+    } yield new CassandraJournal(db, 300) // @TODO get value from config.numberOfShards
   }
 
   private def makeTransactor: ZIO[Any, Throwable, ExecutionContext] =
