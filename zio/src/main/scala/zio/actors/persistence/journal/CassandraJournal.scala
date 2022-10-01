@@ -25,11 +25,12 @@ final class CassandraJournal[Ev](
     }
 
     def journal[A](persistence_id: String, shardId: Long, event: A): Task[Unit] = {
-      val now = UUIDs.timeBased()
+      val now   = UUIDs.timeBased()
+      val bytes = mapper.writeValueAsBytes(event)
       val message = CassandraClient.Message(
         persistence_id,
-        event = mapper.writeValueAsBytes(event), // json.toString.toBytes
-        sequence_nr = 100,                       // @TODO increase using atomic ref using latest from cassandra
+        event = bytes,
+        sequence_nr = 100, // @TODO increase using atomic ref using latest from cassandra
         timestamp = now,
         partition_nr = shardId
       )
@@ -42,7 +43,10 @@ final class CassandraJournal[Ev](
       ZIO
         .fromFuture(_ => db.readEvents(persistence_id, shardId))
         .map { messages =>
-          messages.map(message => mapper.readValue(message.event, new TypeReference[A] {}))
+          messages.map { message =>
+            val a = mapper.readValue(message.event, new TypeReference[A] {})
+            a
+          }
         }
     }
   }

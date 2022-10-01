@@ -3,13 +3,14 @@ package zio.actors.persistence
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
-
 import zio.actors._
 import zio.actors.{ ActorSystem, Context, Supervisor }
 import zio.actors.persistence._
 import zio.UIO
 import zio._
 import zio.Unsafe
+
+import java.io.File
 
 class GuildEventSourcedSpec extends AsyncWordSpec with Matchers with BeforeAndAfterAll {
   override protected def beforeAll(): Unit = {
@@ -30,7 +31,7 @@ class GuildEventSourcedSpec extends AsyncWordSpec with Matchers with BeforeAndAf
   "Persistent actors should be recover state after complete system shutdown" in {
     import example.complex.GuildEventSourced._
     val io = for {
-      actorSystem <- ActorSystem("testSystem2")
+      actorSystem <- ActorSystem("testSystem2", Some(new File("zio/src/main/resources/application.conf")))
       // Scenario 1
       user1 <- Random.nextUUID.map(_.toString)
       user2 <- Random.nextUUID.map(_.toString)
