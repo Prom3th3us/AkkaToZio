@@ -10,15 +10,15 @@ final class CassandraClient(db: CassandraAsyncContext[SnakeCase.type])(implicit 
   import CassandraClient._
   import db._
 
-  def insertEvent(m: Message): Future[Unit] =
-    db.run(quote { (m: Message) =>
-      query[Message]
+  def insertEvent(m: Messages): Future[Unit] =
+    db.run(quote { (m: Messages) =>
+      query[Messages]
         .insertValue(m)
     }(lift(m)))
 
-  def readEvents(persistence_id: String, shardId: Long): Future[List[Message]] =
+  def readEvents(persistence_id: String, shardId: Long): Future[List[Messages]] =
     db.run(quote { (persistence_id: String, shardId: Long) =>
-      query[Message]
+      query[Messages]
         .filter(_.persistence_id == persistence_id)
         .filter(_.partition_nr == shardId)
         .sortBy(_.sequence_nr)
@@ -27,7 +27,7 @@ final class CassandraClient(db: CassandraAsyncContext[SnakeCase.type])(implicit 
 }
 
 object CassandraClient {
-  case class Message(
+  case class Messages(
       persistence_id: String,
       partition_nr: Long,
       sequence_nr: Long,

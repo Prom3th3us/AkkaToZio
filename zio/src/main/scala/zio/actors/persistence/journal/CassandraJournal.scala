@@ -27,7 +27,7 @@ final class CassandraJournal[Ev](
     def journal[A](persistence_id: String, shardId: Long, event: A): Task[Unit] = {
       val now   = UUIDs.timeBased()
       val bytes = mapper.writeValueAsBytes(event)
-      val message = CassandraClient.Message(
+      val message = CassandraClient.Messages(
         persistence_id,
         event = bytes,
         sequence_nr = 100, // @TODO increase using atomic ref using latest from cassandra
