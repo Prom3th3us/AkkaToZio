@@ -78,7 +78,8 @@ lazy val zio = project
       Dependencies.Circee.all,
       Dependencies.Quill.all,
       Dependencies.Cassandra.all,
-      Dependencies.Shardcake.all
+      Dependencies.Shardcake.all,
+      Dependencies.Jackson.all
     ).flatten
   )
   .settings(dockerSettings)

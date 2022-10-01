@@ -1,104 +1,95 @@
 package zio.actors.persistence.journal
 
-import io.circe.{ Decoder, Encoder }
-import io.getquill.{ CassandraAsyncContext, SnakeCase }
-import zio.Task
-import zio.actors.persistence.PersistenceId.PersistenceId
-
-import java.util.UUID
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import com.datastax.driver.core.utils.UUIDs
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
+import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
 import com.typesafe.config.ConfigFactory
+import zio.actors.persistence.PersistenceId.PersistenceId
+import zio.{ Promise, Runtime, Task, Unsafe, ZIO }
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.core.`type`.TypeReference
+import scala.concurrent.ExecutionContext
 
-object CassandraJournal {
+final class CassandraJournal[Ev](
+    db: CassandraClient
+) extends Journal[Ev] {
 
-  private[CassandraJournal] object low_level {
-    lazy val config = ConfigFactory.parseString("""
-        |keyspace=event_sourcing
-        |preparedStatementCacheSize=100
-        |session.contactPoint=127.0.0.1
-        |session.queryOptions.consistencyLevel=ONE
-        |""".stripMargin)
-    lazy val db = new CassandraAsyncContext(SnakeCase, config)
-    import db._
-
-    case class Messages(
-        persistence_id: String,
-        partition_nr: Long,
-        sequence_nr: Long,
-        timestamp: UUID,
-        event: Array[Byte]
-    )
-
-    val insertEvent = (m: Messages) =>
-      db.run(quote { (m: Messages) =>
-        query[Messages]
-          .insertValue(m)
-      }(lift(m)))
-
-    val readEvents = (persistence_id: String, shardId: Long) =>
-      db.run(quote { (persistence_id: String, shardId: Long) =>
-        query[Messages]
-          .filter(_.persistence_id == persistence_id)
-          .filter(_.partition_nr == shardId)
-          .sortBy(_.sequence_nr)
-          .allowFiltering
-      }(lift(persistence_id), lift(shardId)))
+  object Sharding {
+    def shardId: String => Long = _.hashCode % 3 // @TODO
   }
 
   object EventSourcing {
-    import low_level._
+    private val mapper = {
+      val mapper = new ObjectMapper() with ScalaObjectMapper
+      mapper.registerModule(DefaultScalaModule).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+    }
 
-    def journal[A: io.circe.Encoder](persistence_id: String, shardId: Long, event: A): Future[Unit] = {
-      import io.circe.syntax._
-      val message = Messages(
+    def journal[A](persistence_id: String, shardId: Long, event: A): Task[Unit] = {
+      val now = UUIDs.timeBased()
+      val message = CassandraClient.Message(
         persistence_id,
-        event = event.asJson.toString.getBytes,
-        sequence_nr = 100,
-        timestamp = UUIDs.timeBased(),
+        event = mapper.writeValueAsBytes(event), // json.toString.toBytes
+        sequence_nr = 100,                       // @TODO increase using atomic ref using latest from cassandra
+        timestamp = now,
         partition_nr = shardId
       )
-      insertEvent(message)
+      for {
+        _ <- ZIO.fromFuture(_ => db.insertEvent(message))
+      } yield ()
     }
 
-    def recovery[A: io.circe.Decoder](persistence_id: String, shardId: Long): Future[List[A]] = {
-      readEvents(persistence_id, shardId)
-        .map(messages =>
-          messages
-            .map(message => new String(message.event))
-            .map { (event: String) =>
-              import io.circe.parser.decode
-              decode[A](event)
-            }
-            .collect { case Right(event) =>
-              event
-            }
-        )
+    def recovery[A](persistence_id: String, shardId: Long): Task[List[A]] = {
+      ZIO
+        .fromFuture(_ => db.readEvents(persistence_id, shardId))
+        .map { messages =>
+          messages.map(message => mapper.readValue(message.event, new TypeReference[A] {}))
+        }
     }
+  }
+
+  override def persistEvent(persistenceId: PersistenceId, event: Ev): Task[Unit] = {
+    val entityId = persistenceId.value
+    val shardId  = Sharding.shardId(entityId)
+    EventSourcing.journal[Ev](persistenceId.value, shardId, event)
+  }
+
+  override def getEvents(persistenceId: PersistenceId): Task[Seq[Ev]] = {
+    val entityId = persistenceId.value
+    val shardId  = Sharding.shardId(entityId)
+    EventSourcing.recovery[Ev](entityId, shardId)
   }
 }
 
-final class CassandraJournal[Ev: Decoder: Encoder]() extends Journal[Ev] {
+object CassandraJournal extends JournalFactory {
 
-  import CassandraJournal._
-
-  object Sharding {
-    def shardId: String => Long = _ => 0L // _.hashCode % 3
-  }
-
-  override def persistEvent(persistenceId: PersistenceId, event: Ev): Task[Unit] =
-    zio.ZIO.fromFuture { _ =>
-      val entityId = persistenceId.value
-      val shardId  = Sharding.shardId(entityId)
-      EventSourcing.journal[Ev](persistenceId.value, shardId, event)
+  private lazy val runtime = Runtime.default
+  private lazy val transactorPromise =
+    Unsafe.unsafe { implicit u =>
+      runtime.unsafe.run(Promise.make[Exception, ExecutionContext]).getOrThrowFiberFailure()
     }
 
-  override def getEvents(persistenceId: PersistenceId): Task[Seq[Ev]] = {
-    zio.ZIO.fromFuture { _ =>
-      val entityId = persistenceId.value
-      val shardId  = Sharding.shardId(entityId)
-      EventSourcing.recovery[Ev](entityId, shardId)
-    }
+  override def getJournal[Ev](actorSystemName: String, configStr: String): Task[Journal[Ev]] = {
+    for {
+      tnx <- getTransactor
+      db = CassandraClient()(tnx)
+    } yield new CassandraJournal(db)
   }
+
+  private def makeTransactor: ZIO[Any, Throwable, ExecutionContext] =
+    ZIO.runtime[Any].flatMap { implicit rt =>
+      for {
+        transactEC <- ZIO.blockingExecutor.map(_.asExecutionContext)
+      } yield transactEC
+    }
+
+  private def getTransactor: Task[ExecutionContext] =
+    transactorPromise.poll.flatMap {
+      case Some(value) => value
+      case None =>
+        for {
+          newTnx <- makeTransactor
+          _      <- transactorPromise.succeed(newTnx)
+        } yield newTnx
+    }
 }

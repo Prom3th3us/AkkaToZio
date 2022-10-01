@@ -22,6 +22,8 @@ object Dependencies {
     val quill                   = "4.4.1"
     val cassandraDatastax       = "3.11.3"
     val shardcake               = "2.0.0"
+    val jackson                 = "2.14.0-rc1"
+    val jacksonDataTypes        = "2.8.0"
   }
 
   object TypeSafe {
@@ -177,6 +179,14 @@ object Dependencies {
       shardcakeGrpc,
       shardcakeKryo,
       shardcakeRedis
+    )
+  }
+
+  object Jackson {
+    val jackson = "com.fasterxml.jackson.module" %% "jackson-module-scala" % Versions.jackson
+
+    val all = Seq(
+      jackson
     )
   }
 }
