@@ -35,6 +35,7 @@ object GuildEventSourced {
             if (state.members.size >= 5) {
               ZIO.succeed((Command.ignore, _ => Failure(new Exception("Guild is already full!")).asInstanceOf[A]))
             } else {
+              // replier.reply(Success(members + userId)).unless(members.contains(userId)).unit
               ZIO.succeed((Command.persist(JoinedEvent(userId)), st => Success(st.members).asInstanceOf[A]))
             }
           case Leave(userId) => ZIO.succeed((Command.persist(LeftEvent(userId)), _ => ().asInstanceOf[A]))
