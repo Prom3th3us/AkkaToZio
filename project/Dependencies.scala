@@ -15,7 +15,7 @@ object Dependencies {
     val kanelaAgent             = "1.0.15"
     val prometheus              = "0.15.0"
     val zio                     = "2.0.2"
-    val zioActors               = "0.0.9"
+    val zioActors               = "0.1.0"
     val zioTest                 = "2.0.0"
     val zioGrpc                 = "0.6.0-test4"
     val circee                  = "0.15.0-M1"
