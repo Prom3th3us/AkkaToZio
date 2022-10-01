@@ -2,8 +2,8 @@ package example.complex
 
 import com.devsisters.shardcake.Messenger.Replier
 import com.devsisters.shardcake.{ EntityType, Sharding }
-import example.complex.GuildEventSourced.GuildMessage
-import zio.actors.ActorRef
+import example.complex.GuildEventSourced.GuildState
+import zio.actors.{ ActorSystem, Supervisor }
 import zio.{ Dequeue, RIO, ZIO }
 
 import scala.util.Try
@@ -21,27 +21,37 @@ object GuildESBehavior {
   def behavior(
       entityId: String,
       messages: Dequeue[GuildESMessage]
-  ): RIO[Sharding with ActorRef[GuildMessage], Nothing] =
-    ZIO.serviceWithZIO[ActorRef[GuildMessage]](actor =>
+  ): RIO[Sharding with ActorSystem, Nothing] =
+    ZIO.serviceWithZIO[ActorSystem](system =>
       ZIO.logInfo(s"Started entity $entityId") *>
-        messages.take.flatMap(handleMessage(entityId, actor, _)).forever
+        messages.take.flatMap(handleMessage(entityId, system, _)).forever
     )
 
   def handleMessage(
       entityId: String,
-      actor: ActorRef[GuildMessage],
+      actorSystem: ActorSystem,
       message: GuildESMessage
-  ): RIO[Sharding, Unit] =
-    message match {
-      case GuildESMessage.Join(userId, replier) =>
-        actor
-          .?(GuildEventSourced.Join(userId))
-          .flatMap { tryMembers =>
-            replier.reply(tryMembers)
-          }
-      case GuildESMessage.Leave(userId) =>
-        actor
-          .?(GuildEventSourced.Leave(userId))
-          .unit
-    }
+  ): RIO[Sharding, Unit] = {
+    actorSystem
+      .make(
+        entityId,
+        Supervisor.none,
+        GuildState.empty,
+        GuildEventSourced.handler(entityId)
+      )
+      .flatMap { actor =>
+        message match {
+          case GuildESMessage.Join(userId, replier) =>
+            actor
+              .?(GuildEventSourced.Join(userId))
+              .flatMap { tryMembers =>
+                replier.reply(tryMembers)
+              }
+          case GuildESMessage.Leave(userId) =>
+            actor
+              .?(GuildEventSourced.Leave(userId))
+              .unit
+        }
+      }
+  }
 }
