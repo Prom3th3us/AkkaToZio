@@ -1,5 +1,6 @@
 package example.complex
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import zio.actors.Context
 import zio.actors.persistence._
 import zio.{ UIO, ZIO }
@@ -13,8 +14,12 @@ object GuildEventSourced {
   case object Get                  extends GuildMessage[GuildState]
 
   sealed trait GuildEvent
+//  @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "@modelClass")
+  @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
   case class JoinedEvent(userId: String) extends GuildEvent
-  case class LeftEvent(userId: String)   extends GuildEvent
+//  @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, property = "@modelClass")
+  @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "@class")
+  case class LeftEvent(userId: String) extends GuildEvent
 
   case class GuildState(members: Set[String])
   object GuildState {

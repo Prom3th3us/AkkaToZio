@@ -1,7 +1,9 @@
 package zio.actors.persistence.journal
 
 import com.datastax.driver.core.utils.UUIDs
+import com.fasterxml.jackson.annotation.JsonTypeInfo
 import com.fasterxml.jackson.core.`type`.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper.DefaultTyping
 import com.fasterxml.jackson.databind.{ DeserializationFeature, ObjectMapper }
 import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.fasterxml.jackson.module.scala.experimental.ScalaObjectMapper
@@ -21,7 +23,10 @@ final class CassandraJournal[Ev](
   object EventSourcing {
     private val mapper = {
       val mapper = new ObjectMapper() with ScalaObjectMapper
-      mapper.registerModule(DefaultScalaModule).configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+      mapper
+        .registerModule(DefaultScalaModule)
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .enableDefaultTyping(DefaultTyping.JAVA_LANG_OBJECT, JsonTypeInfo.As.PROPERTY)
     }
 
     def journal[A](persistence_id: String, shardId: Long, event: A): Task[Unit] = {
