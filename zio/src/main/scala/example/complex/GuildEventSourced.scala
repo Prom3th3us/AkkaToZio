@@ -1,10 +1,10 @@
 package example.complex
 
-import zio.actors._
-import zio.actors.{ ActorSystem, Context, Supervisor }
+import zio.actors.Context
 import zio.actors.persistence._
 import zio.{ UIO, ZIO }
-import scala.util.{ Try, Success, Failure }
+
+import scala.util.{ Failure, Success, Try }
 
 object GuildEventSourced {
   sealed trait GuildMessage[+_]
@@ -21,7 +21,7 @@ object GuildEventSourced {
     def empty: GuildState = GuildState(members = Set.empty)
   }
 
-  def handler(persistenceId: String) =
+  def handler(persistenceId: String): EventSourcedStateful[Any, GuildState, GuildMessage, GuildEvent] =
     new EventSourcedStateful[Any, GuildState, GuildMessage, GuildEvent](
       PersistenceId(persistenceId)
     ) {
@@ -33,12 +33,12 @@ object GuildEventSourced {
         msg match {
           case Join(userId) =>
             if (state.members.size >= 5) {
-              ZIO.succeed((Command.ignore, _ => Failure(new Exception("Guild is already full!"))))
+              ZIO.succeed((Command.ignore, _ => Failure(new Exception("Guild is already full!")).asInstanceOf[A]))
             } else {
-              ZIO.succeed((Command.persist(JoinedEvent(userId)), st => Success(st.members)))
+              ZIO.succeed((Command.persist(JoinedEvent(userId)), st => Success(st.members).asInstanceOf[A]))
             }
-          case Leave(userId) => ZIO.succeed((Command.persist(LeftEvent(userId)), _ => ()))
-          case Get           => ZIO.succeed((Command.ignore, _ => state))
+          case Leave(userId) => ZIO.succeed((Command.persist(LeftEvent(userId)), _ => ().asInstanceOf[A]))
+          case Get           => ZIO.succeed((Command.ignore, _ => state.asInstanceOf[A]))
         }
 
       override def sourceEvent(state: GuildState, event: GuildEvent): GuildState =
