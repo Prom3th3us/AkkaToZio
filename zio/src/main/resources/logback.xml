@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <logger name="akka" level="WARN" />
+
+    <!-- This is a development logging configuration that logs to standard out, for an example of a production
+    logging config, see the Akka docs: https://doc.akka.io/docs/akka/2.6/typed/logging.html#logback -->
+    <appender name="STDOUT" target="System.out" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>[%date{ISO8601}] [%level] [%logger] [%mdc] [%thread] [%X{akkaSource}] - %msg%n</pattern>
+            <!-- <pattern>%date{"HH:mm:ss.SSS"} %logger [%mdc] - %msg%n</pattern> -->
+            <!--<pattern>%d{HH:mm:ss.SSS} %highlight(%-5level) [%thread] %cyan(%logger{36}) - %highlight(%msg%n)</pattern>-->
+        </encoder>
+    </appender>
+
+    <appender name="ASYNCSTDOUT" class="ch.qos.logback.classic.AsyncAppender">
+        <appender-ref ref="STDOUT" />
+    </appender>
+
+    <root level="ERROR">
+        <appender-ref ref="ASYNCSTDOUT" />
+    </root>
+</configuration>

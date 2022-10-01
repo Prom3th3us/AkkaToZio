@@ -32,12 +32,7 @@ class GuildEventSourcedSpec extends AsyncWordSpec with Matchers with BeforeAndAf
       user1 <- Random.nextUUID.map(_.toString)
       user2 <- Random.nextUUID.map(_.toString)
       persistenceId1 = "guild1"
-      guild1 <- actorSystem.make[Any, GuildState, GuildMessage](
-        persistenceId1,
-        Supervisor.none,
-        GuildState.empty,
-        handler(persistenceId1)
-      )
+      guild1   <- actorSystem.make(persistenceId1, Supervisor.none, GuildState.empty, handler(persistenceId1))
       _        <- guild1 ? Join(user1)
       _        <- guild1 ? Join(user2)
       members1 <- guild1 ? Get
@@ -45,27 +40,23 @@ class GuildEventSourcedSpec extends AsyncWordSpec with Matchers with BeforeAndAf
       _        <- guild1.stop
       // Scenario 2
       persistenceId2 = "guild2"
-      guild2 <- actorSystem.make[Any, GuildState, GuildMessage](
-        persistenceId2,
-        Supervisor.none,
-        GuildState.empty,
-        handler(persistenceId2)
-      )
+      guild2   <- actorSystem.make(persistenceId2, Supervisor.none, GuildState.empty, handler(persistenceId2))
       _        <- guild2 ? Join(user1)
       _        <- guild2 ? Join(user2)
       members2 <- guild2 ? Get
       _        <- Console.printLine(s"members2: $members2")
       _        <- guild2.stop
       // Scenario 3
-      //   guild1      <- actorSystem.make("guild1", Supervisor.none, 0, ESCounterHandler)
-      //   user3       <- Random.nextUUID.map(_.toString)
-      //   user4       <- Random.nextUUID.map(_.toString)
-      //   _           <- guild1 ? Join(user3)
-      //   _           <- guild1 ? Join(user4)
-      //   members1    <- guild1 ? Get
-      //   _           <- guild1.stop
-      _ <- actorSystem.shutdown
-    } yield members1 == members2
+      persistenceId1 = "guild1"
+      guild1B  <- actorSystem.make(persistenceId1, Supervisor.none, GuildState.empty, handler(persistenceId1))
+      user3    <- Random.nextUUID.map(_.toString)
+      user4    <- Random.nextUUID.map(_.toString)
+      _        <- guild1B ? Join(user3)
+      _        <- guild1B ? Join(user4)
+      members1 <- guild1B ? Get
+      _        <- guild1B.stop
+      _        <- actorSystem.shutdown
+    } yield members1.members == (members2.members ++ Set(user3, user4))
 
     val runtime = zio.Runtime.default
     Unsafe.unsafe { implicit unsafe =>
