@@ -1,8 +1,9 @@
-package example.complex
+package example.behavior
 
 import com.devsisters.shardcake.Messenger.Replier
 import com.devsisters.shardcake.{ EntityType, Sharding }
-import example.complex.GuildEventSourced.GuildState
+import example.actor.GuildEventSourced
+import GuildEventSourced.GuildState
 import zio.actors.{ ActorSystem, Supervisor }
 import zio.{ Dequeue, RIO, ZIO }
 

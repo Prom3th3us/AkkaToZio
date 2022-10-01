@@ -1,4 +1,4 @@
-package example.complex
+package example.behavior
 
 import com.devsisters.shardcake.Messenger.Replier
 import com.devsisters.shardcake.{ EntityType, Sharding }

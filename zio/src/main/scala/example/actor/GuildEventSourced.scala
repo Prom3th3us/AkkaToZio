@@ -1,8 +1,8 @@
-package example.complex
+package example.actor
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 import zio.actors.Context
-import zio.actors.persistence._
+import zio.actors.persistence.{ Command, EventSourcedStateful, PersistenceId }
 import zio.{ UIO, ZIO }
 
 import scala.util.{ Failure, Success, Try }

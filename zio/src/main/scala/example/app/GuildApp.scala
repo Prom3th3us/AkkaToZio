@@ -1,11 +1,12 @@
-package example.complex
+package example.app
 
-import com.devsisters.shardcake._
 import com.devsisters.shardcake.interfaces.Serialization
+import com.devsisters.shardcake._
 import dev.profunktor.redis4cats.RedisCommands
-import example.complex.GuildBehavior.GuildMessage.Join
-import example.complex.GuildBehavior._
-import zio._
+import example.behavior.GuildBehavior.GuildMessage.Join
+import example.behavior.GuildBehavior.{ Guild, behavior }
+import example.infra.Layers
+import zio.{ Random, Scope, System, Task, ZIO, ZIOAppDefault, ZLayer }
 
 object GuildApp extends ZIOAppDefault {
   val config: ZLayer[Any, SecurityException, Config] =
@@ -36,7 +37,7 @@ object GuildApp extends ZIOAppDefault {
         config,
         ZLayer.succeed(GrpcConfig.default),
         ZLayer.succeed(RedisConfig.default),
-        redis,
+        Layers.redis,
         StorageRedis.live,
         KryoSerialization.live,
         ShardManagerClient.liveWithSttp,

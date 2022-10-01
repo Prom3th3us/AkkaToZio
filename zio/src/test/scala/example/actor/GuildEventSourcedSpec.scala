@@ -1,4 +1,4 @@
-package zio.actors.persistence
+package example.actor
 
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.matchers.should.Matchers
@@ -25,7 +25,7 @@ class GuildEventSourcedSpec extends AsyncWordSpec with Matchers with BeforeAndAf
   }
 
   "Persistent actors should be recover state after complete system shutdown" in {
-    import example.complex.GuildEventSourced._
+    import example.actor.GuildEventSourced._
     val io = for {
       actorSystem <- ActorSystem("GuildSystem", Some(new File("zio/src/main/resources/application.conf")))
       // Scenario 1

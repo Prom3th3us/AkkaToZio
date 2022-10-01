@@ -1,4 +1,4 @@
-package example
+package example.infra
 
 import com.devsisters.shardcake.StorageRedis.Redis
 import dev.profunktor.redis4cats.Redis
@@ -9,7 +9,7 @@ import dev.profunktor.redis4cats.pubsub.PubSub
 import zio.interop.catz._
 import zio.{ Task, ZEnvironment, ZIO, ZLayer }
 
-package object complex {
+object Layers {
   val redis: ZLayer[Any, Throwable, Redis] =
     ZLayer.scopedEnvironment {
       implicit val runtime: zio.Runtime[Any] = zio.Runtime.default
