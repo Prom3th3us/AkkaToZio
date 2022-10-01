@@ -6,7 +6,7 @@ import org.scalatest.wordspec.AsyncWordSpec
 import zio.Unsafe
 import zio.actors.persistence.PersistenceId
 
-class JournalSpec extends AsyncWordSpec with Matchers with BeforeAndAfterAll {
+class CassandraJournalSpec extends AsyncWordSpec with Matchers with BeforeAndAfterAll {
 
   override protected def beforeAll(): Unit = {
     import scala.sys.process._
@@ -24,11 +24,9 @@ class JournalSpec extends AsyncWordSpec with Matchers with BeforeAndAfterAll {
   }
 
   "Persistent actors should be recover state after complete system shutdown" in {
-
     case class Incremented(amount: Int)
-
     val db            = CassandraClient()
-    val journal       = new zio.actors.persistence.journal.CassandraJournal[Incremented](db)
+    val journal       = new zio.actors.persistence.journal.CassandraJournal[Incremented](db, 300)
     val persistenceId = PersistenceId("PersistentCounterActor-A")
 
     val runtime = zio.Runtime.default
