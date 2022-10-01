@@ -30,7 +30,7 @@ class GuildEventSourcedSpec extends AsyncWordSpec with Matchers with BeforeAndAf
   "Persistent actors should be recover state after complete system shutdown" in {
     import example.complex.GuildEventSourced._
     val io = for {
-      actorSystem <- ActorSystem("test-system")
+      actorSystem <- ActorSystem("testSystem1")
       // Scenario 1
       user1 <- Random.nextUUID.map(_.toString)
       user2 <- Random.nextUUID.map(_.toString)
