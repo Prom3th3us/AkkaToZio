@@ -75,11 +75,8 @@ object CassandraJournal {
               event
             }
         )
-
     }
-
   }
-
 }
 
 final class CassandraJournal[Ev: Decoder: Encoder]() extends Journal[Ev] {
@@ -104,5 +101,4 @@ final class CassandraJournal[Ev: Decoder: Encoder]() extends Journal[Ev] {
       EventSourcing.recovery[Ev](entityId, shardId)
     }
   }
-
 }
