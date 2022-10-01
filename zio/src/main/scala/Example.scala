@@ -10,7 +10,7 @@ object Example extends zio.ZIOAppDefault {
   implicit val decoder: Decoder[Incremented] = deriveDecoder
 
   override def run: ZIO[Any with ZIOAppArgs with Scope, Any, Any] = {
-    val journal = new zio.actors.persistence.journal.CassandraJournal[Incremented]()
+    val journal       = new zio.actors.persistence.journal.CassandraJournal[Incremented]()
     val persistenceId = PersistenceId("PersistentCounterActor-A")
     for {
       _      <- journal.persistEvent(persistenceId, Incremented(100))

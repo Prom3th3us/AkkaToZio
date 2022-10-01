@@ -13,7 +13,7 @@ package object complex {
   val redis: ZLayer[Any, Throwable, Redis] =
     ZLayer.scopedEnvironment {
       implicit val runtime: zio.Runtime[Any] = zio.Runtime.default
-      implicit val logger: Log[Task]         = new Log[Task] {
+      implicit val logger: Log[Task] = new Log[Task] {
         override def debug(msg: => String): Task[Unit] = ZIO.logDebug(msg)
         override def error(msg: => String): Task[Unit] = ZIO.logError(msg)
         override def info(msg: => String): Task[Unit]  = ZIO.logInfo(msg)

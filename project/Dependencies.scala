@@ -17,9 +17,11 @@ object Dependencies {
     val zio                     = "2.0.2"
     val zioActors               = "0.0.9"
     val zioTest                 = "2.0.0"
+    val zioGrpc                 = "0.6.0-test4"
     val circee                  = "0.15.0-M1"
     val quill                   = "4.4.1"
     val cassandraDatastax       = "3.11.3"
+    val shardcake               = "2.0.0"
   }
 
   object TypeSafe {
@@ -115,16 +117,18 @@ object Dependencies {
   }
 
   object Zio {
-    val zio                  = "dev.zio" %% "zio"                    % Versions.zio
-    val zioActors            = "dev.zio" %% "zio-actors"             % Versions.zioActors
-    val zioActorsPersistence = "dev.zio" %% "zio-actors-persistence" % Versions.zioActors
-    val zioTest              = "dev.zio" %% "zio-test"               % Versions.zioTest % Test
+    val zio                  = "dev.zio"                       %% "zio"                    % Versions.zio
+    val zioActors            = "dev.zio"                       %% "zio-actors"             % Versions.zioActors
+    val zioActorsPersistence = "dev.zio"                       %% "zio-actors-persistence" % Versions.zioActors
+    val zioTest              = "dev.zio"                       %% "zio-test"               % Versions.zioTest % Test
+    val zioGrpc              = "com.thesamet.scalapb.zio-grpc" %% "zio-grpc-core"          % Versions.zioGrpc
 
     val all = Seq(
       zio,
       zioActors,
       zioActorsPersistence,
-      zioTest
+      zioTest,
+      zioGrpc
     )
   }
 
@@ -153,6 +157,26 @@ object Dependencies {
 
     val all = Seq(
       cassandraDatastax
+    )
+  }
+
+  object Shardcake {
+    val shardcake         = "com.devsisters" %% "shardcake-core"               % Versions.shardcake
+    val shardcakeEntities = "com.devsisters" %% "shardcake-entities"           % Versions.shardcake
+    val shardcakeManager  = "com.devsisters" %% "shardcake-manager"            % Versions.shardcake
+    val shardcakeK8s      = "com.devsisters" %% "shardcake-health-k8s"         % Versions.shardcake
+    val shardcakeGrpc     = "com.devsisters" %% "shardcake-protocol-grpc"      % Versions.shardcake
+    val shardcakeKryo     = "com.devsisters" %% "shardcake-serialization-kryo" % Versions.shardcake
+    val shardcakeRedis    = "com.devsisters" %% "shardcake-storage-redis"      % Versions.shardcake
+
+    val all = Seq(
+      shardcake,
+      shardcakeEntities,
+      shardcakeManager,
+      shardcakeK8s,
+      shardcakeGrpc,
+      shardcakeKryo,
+      shardcakeRedis
     )
   }
 }

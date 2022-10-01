@@ -73,12 +73,12 @@ lazy val zio = project
   )
   .settings(commonSettings, scalafixSettings)
   .settings(
-    <<<<<<< HEAD
-      libraryDependencies ++= Seq(
+    libraryDependencies ++= Seq(
       Dependencies.Zio.all,
       Dependencies.Circee.all,
       Dependencies.Quill.all,
-      Dependencies.Cassandra.all
+      Dependencies.Cassandra.all,
+      Dependencies.Shardcake.all
     ).flatten
   )
   .settings(dockerSettings)
